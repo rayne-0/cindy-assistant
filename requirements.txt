@@ -11,3 +11,9 @@ plyer
 psutil
 edge-tts
 pygame
+customtkinter
+pvporcupine
+pyautogui
+google-api-python-client
+google-auth-httplib2
+google-auth-oauthlib

@@ -20,9 +20,9 @@ def speak(text: str) -> None:
 
     try:
         async def _generate_and_play():
-            # 'en-US-JennyNeural' is a very natural female American voice
-            voice = 'en-US-JennyNeural'
-            communicate = edge_tts.Communicate(text, voice)
+            # 'en-US-AriaNeural' is highly expressive, and slight adjustments make it sound more upbeat and natural
+            voice = 'en-US-AriaNeural'
+            communicate = edge_tts.Communicate(text, voice, rate="+5%", pitch="+2Hz")
             
             # Create a secure temporary file
             with tempfile.NamedTemporaryFile(delete=False, suffix=".mp3") as fp:

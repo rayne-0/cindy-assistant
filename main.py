@@ -17,6 +17,8 @@ from utils.constants import (
 )
 
 from utils.app_registry import load_apps
+from utils.gui import get_overlay
+import threading
 
 import config
 
@@ -38,6 +40,11 @@ def main():
     print("Loading installed applications...")
     load_apps()
 
+    print("Initializing GUI Overlay...")
+    
+    # Initialize CTk on the exact same thread that will call root.update()
+    overlay = get_overlay(assistant)
+    
     startup_banner()
 
     if config.ENABLE_LOGGING:
@@ -61,7 +68,7 @@ def main():
 
         else:
 
-            user_input = get_text_input()
+            user_input = get_text_input(overlay)
 
             if user_input == EXIT_COMMAND:
 
@@ -80,8 +87,9 @@ def main():
             log(f"User: {user_input}")
 
         response = assistant.process_input(user_input)
-
+        
         if not response:
+            overlay.update_status_externally("idle")
             continue
 
         if config.PRINT_RESPONSES:
@@ -91,7 +99,10 @@ def main():
             log(f"{ASSISTANT_NAME}: {response}")
 
         if config.ENABLE_VOICE_OUTPUT:
+            overlay.update_status_externally("speaking")
             speak(response)
+            
+        overlay.update_status_externally("idle")
 
 
 if __name__ == "__main__":
