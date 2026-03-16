@@ -22,5 +22,13 @@
   {
     "role": "model",
     "content": "Hey there! What can I do for you right now?"
+  },
+  {
+    "role": "user",
+    "content": "s speed mode."
+  },
+  {
+    "role": "model",
+    "content": "Activating Speed Mode now. I'm optimizing your system by closing unnecessary background processes to boost performance. All done!"
   }
 ]

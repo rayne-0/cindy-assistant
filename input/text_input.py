@@ -3,12 +3,30 @@ import msvcrt
 import time
 from utils.helpers import normalize_text
 
-def get_text_input(overlay) -> str:
+
+def _check_keyboard():
+    """
+    Non-blocking check: return the next character typed, or None if nothing pressed.
+    Used by main.py to detect when the user starts typing without blocking the event loop.
+    """
+    if msvcrt.kbhit():
+        try:
+            char = msvcrt.getwche()
+            return char
+        except Exception:
+            return None
+    return None
+
+
+def get_text_input(overlay, prefill: str = "") -> str:
     """
     Capture user input from the terminal non-blockingly while updating the overlay GUI.
+    `prefill` is used when the first character was already consumed by `_check_keyboard`.
     """
-    print("> ", end="", flush=True)
-    input_str = ""
+    if not prefill:
+        print("> ", end="", flush=True)
+    
+    input_str = prefill
     
     while True:
         # Update the CustomTkinter GUI so it doesn't freeze
@@ -43,4 +61,4 @@ def get_text_input(overlay) -> str:
                 return "exit"
         
         # Prevent 100% CPU usage loop
-        time.sleep(0.01)
+        time.sleep(0.01)
