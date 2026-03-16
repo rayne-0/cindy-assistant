@@ -124,6 +124,20 @@ def parse_command(command: str):
         return "time"
 
     # ----------------------------------
+    # Google Workspace Commands
+    # ----------------------------------
+    if "my schedule" in command or "calendar" in command or "events today" in command:
+        return "calendar_today"
+    
+    if command.startswith("send email to "):
+        # format: send email to <person> saying <body>
+        rest = command[13:].strip()
+        if " saying " in rest:
+            parts = rest.split(" saying ", 1)
+            return ("send_email", {"to": parts[0].strip(), "body": parts[1].strip()})
+        return ("send_email", {"to": rest, "body": ""})
+
+    # ----------------------------------
     # Agent (Computer Control) Commands
     # Pattern: agent type <text>, agent click, agent press <key>, agent screenshot
     # ----------------------------------

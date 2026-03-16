@@ -97,8 +97,32 @@ def main():
         if config.ENABLE_VOICE_OUTPUT:
             overlay.update_status_externally("speaking")
             speak(response)
-            
+
         overlay.update_status_externally("idle")
+        
+        # Multi-Turn Conversation: if Cindy ends her response with a '?',
+        # she is asking a follow-up question — keep the mic open immediately.
+        response_stripped = response.strip()
+        if response_stripped.endswith("?"):
+            print("[Multi-turn] Cindy asked a follow-up — listening for reply...")
+            overlay.update_status_externally("listening")
+            follow_up = listen_for_command()
+            if follow_up:
+                # Prepend "execute" so it passes the wake word check
+                user_input = f"execute {follow_up}"
+                # Log and process the follow-up directly without going back to Porcupine
+                if config.ENABLE_LOGGING:
+                    log(f"User (follow-up): {follow_up}")
+                response2 = assistant.process_input(user_input)
+                if response2:
+                    if config.PRINT_RESPONSES:
+                        print(response2)
+                    if config.ENABLE_LOGGING:
+                        log(f"{ASSISTANT_NAME}: {response2}")
+                    if config.ENABLE_VOICE_OUTPUT:
+                        overlay.update_status_externally("speaking")
+                        speak(response2)
+            overlay.update_status_externally("idle")
 
 
 if __name__ == "__main__":

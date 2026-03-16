@@ -16,6 +16,7 @@ from utils.gemini_client import ask_assistant
 from utils.overlay import show_overlay
 from utils.optimizer import speed_up_system
 from utils.agent_control import run_agent_command
+from utils.google_workspace import get_todays_events, send_gmail
 import config
 from plyer import notification
 
@@ -48,6 +49,9 @@ def _execute_command_inner(action, assistant=None):
 
     if action == "speed_up_system":
         return speed_up_system()
+    
+    if action == "calendar_today":
+        return get_todays_events()
 
     # -----------------------------------------
     # Structured commands (tuples)
@@ -123,11 +127,19 @@ def _execute_command_inner(action, assistant=None):
             return run_agent_command(value.get("action"), value)
 
         # -----------------------------
+        # Send Email (Google Workspace)
+        # -----------------------------
+        if command == "send_email":
+            to = value.get("to", "")
+            body = value.get("body", "(No body)")
+            subject = "Message from Cindy"
+            return send_gmail(to, subject, body)
+
+        # -----------------------------
         # Gemini Chat Fallback
         # -----------------------------
         if command == "chat":
             if config.USE_GEMINI:
-                # Optionally log or print that we are asking Gemini
                 return ask_assistant(value)
             else:
                 return RESPONSE_UNKNOWN
