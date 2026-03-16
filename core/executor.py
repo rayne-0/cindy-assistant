@@ -16,7 +16,7 @@ from utils.gemini_client import ask_assistant
 from utils.overlay import show_overlay
 from utils.optimizer import speed_up_system
 from utils.agent_control import run_agent_command
-from utils.google_workspace import get_todays_events, send_gmail
+from utils.local_calendar import get_todays_events, get_upcoming_events, add_event, remove_event
 import config
 from plyer import notification
 
@@ -52,6 +52,9 @@ def _execute_command_inner(action, assistant=None):
     
     if action == "calendar_today":
         return get_todays_events()
+
+    if action == "calendar_upcoming":
+        return get_upcoming_events()
 
     # -----------------------------------------
     # Structured commands (tuples)
@@ -127,13 +130,13 @@ def _execute_command_inner(action, assistant=None):
             return run_agent_command(value.get("action"), value)
 
         # -----------------------------
-        # Send Email (Google Workspace)
+        # Local Calendar
         # -----------------------------
-        if command == "send_email":
-            to = value.get("to", "")
-            body = value.get("body", "(No body)")
-            subject = "Message from Cindy"
-            return send_gmail(to, subject, body)
+        if command == "add_event":
+            return add_event(value.get("title", "Untitled"), value.get("date"), value.get("time"))
+
+        if command == "remove_event":
+            return remove_event(value)
 
         # -----------------------------
         # Gemini Chat Fallback

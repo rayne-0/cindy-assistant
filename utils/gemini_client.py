@@ -66,7 +66,13 @@ def ask_assistant(query: str) -> str:
         return reply
         
     except Exception as e:
+        err_str = str(e).lower()
+        # Detect network-related failures
+        if any(k in err_str for k in ["connection", "timeout", "network", "ssl", "socket", "unreachable", "offline"]):
+            return (
+                "I can't reach the internet right now, so my AI brain is offline. "
+                "I can still manage your tasks, calendar, notes, and control your computer — just ask!"
+            )
         import traceback
-        err = traceback.format_exc()
-        print(f"Gemini Error details: {err}")
-        return f"Sorry, I am having trouble connecting to my Gemini brain. Error: {e}"
+        print(f"Gemini Error details: {traceback.format_exc()}")
+        return f"Sorry, I ran into an issue with my AI brain. Error: {e}"

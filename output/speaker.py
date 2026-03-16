@@ -10,41 +10,55 @@ import pygame
 # Initialize pygame mixer required for audio playback
 pygame.mixer.init()
 
+
+def _speak_offline(text: str) -> None:
+    """Fallback: use pyttsx3 for local offline TTS."""
+    try:
+        import pyttsx3
+        engine = pyttsx3.init()
+        engine.setProperty('rate', 175)
+        # Pick a female-sounding voice if available
+        voices = engine.getProperty('voices')
+        for v in voices:
+            if 'female' in v.name.lower() or 'zira' in v.name.lower():
+                engine.setProperty('voice', v.id)
+                break
+        engine.say(text)
+        engine.runAndWait()
+        engine.stop()
+    except Exception as e:
+        print(f"Offline TTS error: {e}")
+
+
 def speak(text: str) -> None:
     """
-    Speak a message using high-quality Azure Neural TTS.
-    Downloads the audio to a temp file and plays it via pygame.
+    Speak using high-quality Azure Neural TTS (edge-tts).
+    Automatically falls back to offline pyttsx3 if there is no internet.
     """
     if not text:
         return
 
     try:
         async def _generate_and_play():
-            # 'en-US-AriaNeural' is highly expressive, and slight adjustments make it sound more upbeat and natural
             voice = 'en-US-AriaNeural'
             communicate = edge_tts.Communicate(text, voice, rate="+5%", pitch="+2Hz")
-            
-            # Create a secure temporary file
+
             with tempfile.NamedTemporaryFile(delete=False, suffix=".mp3") as fp:
                 temp_filename = fp.name
-            
-            # Download audio from Microsoft Edge API
+
             await communicate.save(temp_filename)
-            
-            # Play the audio file
+
             pygame.mixer.music.load(temp_filename)
             pygame.mixer.music.play()
-            
-            # Wait until playback is completely finished
+
             while pygame.mixer.music.get_busy():
                 pygame.time.Clock().tick(10)
-                
-            # Cleanup
+
             pygame.mixer.music.unload()
             os.remove(temp_filename)
 
-        # Run the async function synchronously block
         asyncio.run(_generate_and_play())
 
-    except Exception as e:
-        print(f"Speech engine error: {e}")
+    except Exception:
+        # If edge-tts fails (likely no internet), fall back to local pyttsx3
+        _speak_offline(text)

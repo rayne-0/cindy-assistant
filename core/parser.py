@@ -124,18 +124,39 @@ def parse_command(command: str):
         return "time"
 
     # ----------------------------------
-    # Google Workspace Commands
+    # Local Calendar Commands (offline)
     # ----------------------------------
-    if "my schedule" in command or "calendar" in command or "events today" in command:
+    if "my schedule" in command or "events today" in command or "what do i have today" in command:
         return "calendar_today"
-    
-    if command.startswith("send email to "):
-        # format: send email to <person> saying <body>
-        rest = command[13:].strip()
-        if " saying " in rest:
-            parts = rest.split(" saying ", 1)
-            return ("send_email", {"to": parts[0].strip(), "body": parts[1].strip()})
-        return ("send_email", {"to": rest, "body": ""})
+
+    if "upcoming" in command and ("event" in command or "schedule" in command):
+        return "calendar_upcoming"
+
+    if command.startswith("add event "):
+        # format: add event <title> on <date> at <time>
+        rest = command[10:].strip()
+        title = rest
+        date_str = None
+        time_str = None
+        if " on " in rest:
+            parts = rest.split(" on ", 1)
+            title = parts[0].strip()
+            tail = parts[1].strip()
+            if " at " in tail:
+                d, t = tail.split(" at ", 1)
+                date_str = d.strip()
+                time_str = t.strip()
+            else:
+                date_str = tail
+        elif " at " in rest:
+            parts = rest.split(" at ", 1)
+            title = parts[0].strip()
+            time_str = parts[1].strip()
+        return ("add_event", {"title": title, "date": date_str, "time": time_str})
+
+    if command.startswith("remove event ") or command.startswith("delete event "):
+        title = command.split("event ", 1)[1].strip()
+        return ("remove_event", title)
 
     # ----------------------------------
     # Agent (Computer Control) Commands
