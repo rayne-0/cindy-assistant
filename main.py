@@ -1,3 +1,8 @@
+from dotenv import load_dotenv
+
+# Load environment variables from .env early
+load_dotenv()
+
 from core.assistant import CindyAssistant
 
 from input import get_text_input, listen_for_command

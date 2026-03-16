@@ -31,3 +31,11 @@ PRINT_RESPONSES = True
 # ==============================
 
 DEBUG_MODE = False
+
+
+# ==============================
+# Integrations
+# ==============================
+
+# Use Gemini for fallback conversational queries
+USE_GEMINI = True

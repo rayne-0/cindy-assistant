@@ -1,6 +1,13 @@
 SpeechRecognition
 PyAudio
-pyttsx3
 openai-whisper
 torch
 pywin32
+google-genai
+python-dotenv
+pystray
+Pillow
+plyer
+psutil
+edge-tts
+pygame

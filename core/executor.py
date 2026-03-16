@@ -1,6 +1,7 @@
 import os
 import subprocess
 import datetime
+import urllib.parse
 
 from utils.constants import (
     RESPONSE_SHUTDOWN,
@@ -11,12 +12,41 @@ from utils.constants import (
 from utils.app_registry import load_apps
 from utils.notes import add_note, get_notes
 from utils.tasks import add_task, get_tasks
+from utils.gemini_client import ask_assistant
+from utils.overlay import show_overlay
+from utils.optimizer import speed_up_system
+import config
+from plyer import notification
 
-
-def execute_command(action, assistant=None):
+def _execute_command_inner(action, assistant=None):
     """
     Execute parsed commands from Cindy's parser.
     """
+    
+    if action == "show_todo_overlay":
+        # Launch the overlay in a separate detached process so it doesn't block
+        # Since tkinter mainloop blocks, we run it in a subprocess
+        # Popen without wait allows the assistant to keep listening
+        subprocess.Popen(["python", "-c", "import sys; sys.path.append('.'); from utils.overlay import show_overlay; show_overlay()"])
+        return "Opening To-Do List."
+
+    if action == "test_notification":
+        notification.notify(
+            title="Cindy Assistant",
+            message="This is a test notification from Cindy!",
+            app_icon=None,
+            timeout=5,
+        )
+        return "Notification sent."
+
+    if action == "run_background":
+        if assistant:
+            assistant.run_in_background()
+            return "Minimizing to system tray."
+        return "I can't do that right now."
+
+    if action == "speed_up_system":
+        return speed_up_system()
 
     # -----------------------------------------
     # Structured commands (tuples)
@@ -67,6 +97,33 @@ def execute_command(action, assistant=None):
             add_task(value)
 
             return "Task added."
+
+        # -----------------------------
+        # Web Search
+        # -----------------------------
+        if command == "search":
+            browser, query = value
+            
+            # URL encode the search text
+            url = f"https://www.google.com/search?q={urllib.parse.quote(query)}"
+            
+            # Execute browser start command
+            if browser == "chrome":
+                os.system(f'start chrome "{url}"')
+                return f"Searching for {query} on Chrome."
+            elif browser == "brave":
+                os.system(f'start brave "{url}"')
+                return f"Searching for {query} on Brave."
+
+        # -----------------------------
+        # Gemini Chat Fallback
+        # -----------------------------
+        if command == "chat":
+            if config.USE_GEMINI:
+                # Optionally log or print that we are asking Gemini
+                return ask_assistant(value)
+            else:
+                return RESPONSE_UNKNOWN
 
     # -----------------------------------------
     # Simple Commands
@@ -128,3 +185,15 @@ def execute_command(action, assistant=None):
     # Unknown Command
     # -----------------------------------------
     return RESPONSE_UNKNOWN
+
+def execute_command_safe(action, assistant=None):
+    try:
+        return _execute_command_inner(action, assistant)
+    except Exception as e:
+        import traceback
+        err = traceback.format_exc()
+        print(f"Executor Error: {err}")
+        return f"Error executing command: {e}"
+
+# Reassign the exported function to the safe wrapper
+execute_command = execute_command_safe

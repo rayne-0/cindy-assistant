@@ -36,6 +36,30 @@ def parse_command(command: str):
         return "disable_speed"
 
     # ----------------------------------
+    # Sequence parsing structure
+    # pattern: sequence [id] [name]
+    # ----------------------------------
+    if command.startswith("sequence "):
+        parts = command.split(" ", 2)
+        if len(parts) >= 3:
+            seq_id = parts[1]
+            seq_name = parts[2].strip()
+            
+            if seq_name in ["pull up todo list"]:
+                return "show_todo_overlay"
+            elif seq_name in ["a notification thing", "notifications"]:
+                return "test_notification"
+            elif seq_name in ["run in the background thing", "background"]:
+                return "run_background"
+            elif seq_name in ["check all processes and speed up the system"]:
+                return "speed_up_system"
+            elif seq_name.startswith("write todo list "):
+                task = seq_name.replace("write todo list ", "").strip()
+                return ("add_task", task)
+            
+            return ("sequence", (seq_id, seq_name))
+
+    # ----------------------------------
     # Notes
     # ----------------------------------
     if command.startswith("note "):
@@ -52,8 +76,8 @@ def parse_command(command: str):
         task = command.replace("add task ", "").strip()
         return ("add_task", task)
 
-    if command == "show tasks":
-        return "show_tasks"
+    if command == "show tasks" or command == "pull up todo list":
+        return "show_todo_overlay"
 
     # ----------------------------------
     # Open Applications
@@ -68,6 +92,26 @@ def parse_command(command: str):
         return ("open_app", app_name)
 
     # ----------------------------------
+    # Web Search
+    # ----------------------------------
+    if command.startswith("search "):
+        query = command[7:].strip()
+        browser = "chrome"  # default
+        
+        if query.endswith(" on chrome"):
+            query = query[:-10].strip()
+        elif query.endswith(" on brave"):
+            browser = "brave"
+            query = query[:-9].strip()
+        elif query.startswith("chrome "):
+            query = query[7:].strip()
+        elif query.startswith("brave "):
+            browser = "brave"
+            query = query[6:].strip()
+            
+        return ("search", (browser, query))
+
+    # ----------------------------------
     # System Commands
     # ----------------------------------
     if CMD_SHUTDOWN in command:
@@ -80,6 +124,6 @@ def parse_command(command: str):
         return "time"
 
     # ----------------------------------
-    # Unknown Command
+    # Unknown Command Fallback to LLM
     # ----------------------------------
-    return "unknown"
+    return ("chat", command)

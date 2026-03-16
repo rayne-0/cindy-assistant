@@ -2,6 +2,7 @@ from utils.helpers import contains_wake_word, clean_command
 from core.parser import parse_command
 from core.executor import execute_command
 from utils.constants import RESPONSE_UNKNOWN
+from utils.tray import run_in_background
 
 import config
 
@@ -16,6 +17,9 @@ class CindyAssistant:
 
         # Speed mode allows commands without wake word
         self.speed_mode = False
+
+    def run_in_background(self):
+        run_in_background()
 
     def process_input(self, user_input: str) -> str:
         """
@@ -47,7 +51,9 @@ class CindyAssistant:
         # -----------------------------------------
         # Execute Command
         # -----------------------------------------
+        print(f"DEBUG: Parsed Action -> {action}")
         response = execute_command(action, self)
+        print(f"DEBUG: Executor returned -> {response}")
 
         if not response:
             return RESPONSE_UNKNOWN
