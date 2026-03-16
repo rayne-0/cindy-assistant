@@ -1,42 +1,41 @@
 # Cindy Assistant
 
-A lightweight, extensible voice and text-based personal assistant for Windows, designed for simplicity and customizability.
+A lightweight, extensible voice and text-based personal assistant for Windows, designed for simplicity, customizability, and deep Desktop OS integration.
 
 ## Features
 
--   **Voice & Text Control**: Interact via typed commands or voice recognition.
+-   **Gemini AI Brain**: Cindy uses the `gemini-2.5-flash` model for intelligent fallbacks and conversational contextual memory.
+-   **Natural Voice TTS**: Powered by `edge-tts` connected directly to Microsoft Azure Neural APIs for highly realistic speech.
+-   **Web Search Integration**: Launch Google searches instantly via Chrome or Brave browsers.
+-   **GUI To-Do Overlay**: A transparent, always-on-top checklist interface built in `tkinter` to manage tasks seamlessly.
+-   **System Tray Backgrounding**: Uses `pystray` to minimize Cindy to your system tray natively.
+-   **System Optimizer**: Instantly kill heavy background games/apps and purge `Temp` folders to free up RAM via `psutil`.
 -   **Application Launcher**: Open any installed application on your Windows machine (e.g., "open chrome").
--   **Note Taking**: Quickly save and retrieve notes.
--   **Task Management**: Maintain a simple to-do list.
--   **System Commands**: Shutdown or restart your computer.
--   **Time Inquiry**: Ask for the current time.
--   **Configurable**: Easily toggle features like voice output, logging, and wake word requirements via `config.py`.
--   **Speed Mode**: Chain commands rapidly without repeating the wake word.
+-   **Native Notifications**: Alert you to background changes with Windows Toast notifications.
 
 ## Installation
 
 1.  **Prerequisites**:
-    -   Python 3.x
+    -   Python 3.10+
     -   `pip` package manager
+    -   A free Google Gemini API Key
 
 2.  **Clone the repository** (or download the source code):
     ```bash
-    git clone <your-repo-url>
+    git clone https://github.com/rayne-0/cindy-assistant.git
     cd Assistant
     ```
 
-3.  **Create a virtual environment** (recommended):
-    ```bash
-    python -m venv venv
-    venv\Scripts\activate
+3.  **Environment Variables**:
+    Create a `.env` file in the root directory and add your key:
+    ```
+    GEMINI_API_KEY=your_key_here
     ```
 
 4.  **Install dependencies**:
-    The project uses several Python libraries. Install them using the `requirements.txt` file.
     ```bash
     pip install -r requirements.txt
     ```
-    > **Note**: `PyAudio` can sometimes be challenging to install on Windows. If you encounter issues, you may need to find and install a pre-compiled wheel (`.whl`) file that matches your Python version and system architecture (32-bit or 64-bit).
 
 ## Usage
 
@@ -44,44 +43,29 @@ A lightweight, extensible voice and text-based personal assistant for Windows, d
     ```bash
     python main.py
     ```
-    The assistant will start, load your installed applications, and be ready for commands.
 
 2.  **Interact with Cindy**:
-    -   You will start in **text mode**. You can type commands directly into the terminal.
-    -   Type `listen` to enter **voice mode**. The assistant will now listen for voice commands.
-    -   In voice mode, start your command with the wake word "**execute**" (e.g., "execute open chrome").
-    -   To leave voice mode, say "**exit voice mode**".
-    -   To stop the assistant entirely, type `exit` in text mode.
-
-### Speed Mode
-
-For executing multiple commands in a row, you can enable "speed mode" to avoid repeating the wake word.
-
--   **Enable**: Say or type `execute speed mode`.
--   **Usage**: Once enabled, you no longer need to say "execute" before each command.
--   **Disable**: Say or type `exit speed`.
+    -   You will start in **text mode**. Type commands directly into the terminal.
+    -   Start your command with the wake word "**execute**" (e.g., "execute open chrome").
+    -   Type `listen` to enter **voice mode**. 
 
 ## Available Commands
 
 | Command | Description | Example |
 | :--- | :--- | :--- |
 | `open <app>` | Opens an installed application. | `execute open vscode` |
-| `note <text>` | Saves a new note. | `execute note remember to buy milk` |
-| `show notes` | Displays all saved notes. | `execute show notes` |
-| `add task <text>` | Adds a task to your to-do list. | `execute add task finish the readme` |
-| `show tasks` | Displays all tasks. | `execute show tasks` |
-| `time` | Tells you the current time. | `execute time` |
-| `shutdown` | Shuts down the computer after 1 second. | `execute shutdown` |
-| `restart` | Restarts the computer after 1 second. | `execute restart` |
+| `search <query> on <browser>` | Googles a query. Chrome is default. | `execute search weather tomorrow on brave` |
+| `sequence 1 write todo list <task>` | Adds a task to `tasks.json`. | `execute sequence 1 write todo list buy milk` |
+| `sequence 2 pull up todo list` | Spawns the transparent GUI to-do list. | `execute sequence 2 pull up todo list` |
+| `sequence 3 a notification thing` | Sends a Windows Toast notification. | `execute sequence 3 a notification thing` |
+| `sequence 4 run in the background thing`| Hides the terminal window to the System Tray. | `execute sequence 4 run in the background thing` |
+| `sequence 5 check all processes...` | Kills background apps and clears temp cache. | `execute sequence 5 check all processes and speed up the system` |
+| `<unknown>` | Anything else routes through the Gemini AI. | `execute how are you feeling today?` |
 
 ## Configuration
-
 You can customize the assistant's behavior by editing the `config.py` file.
-
 | Setting | Description |
 | :--- | :--- |
-| `ENABLE_VOICE_OUTPUT` | Set to `True` for the assistant to have spoken responses. |
-| `ENABLE_LOGGING` | Set to `True` to create a log file of all interactions. |
-| `ENABLE_VOICE_INPUT` | Set to `True` to allow switching into voice mode with the `listen` command. |
-| `REQUIRE_WAKE_WORD` | Set to `True` to require the wake word for commands (can be bypassed with Speed Mode). |
-| `PRINT_RESPONSES` | Set to `True` to see the assistant's text responses printed in the terminal. |
+| `USE_GEMINI` | Set to `True` to enable the AI fallback brain. |
+| `ENABLE_VOICE_OUTPUT` | Set to `True` for Cindy to speak her responses using `edge-tts`. |
+| `REQUIRE_WAKE_WORD` | Set to `True` to require the 'execute' prefix. |
