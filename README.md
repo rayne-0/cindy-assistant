@@ -4,14 +4,19 @@ A lightweight, extensible voice and text-based personal assistant for Windows, d
 
 ## Features
 
--   **Gemini AI Brain**: Cindy uses the `gemini-2.5-flash` model for intelligent fallbacks and conversational contextual memory.
--   **Natural Voice TTS**: Powered by `edge-tts` connected directly to Microsoft Azure Neural APIs for highly realistic speech.
--   **Web Search Integration**: Launch Google searches instantly via Chrome or Brave browsers.
--   **GUI To-Do Overlay**: A transparent, always-on-top checklist interface built in `tkinter` to manage tasks seamlessly.
--   **System Tray Backgrounding**: Uses `pystray` to minimize Cindy to your system tray natively.
--   **System Optimizer**: Instantly kill heavy background games/apps and purge `Temp` folders to free up RAM via `psutil`.
--   **Application Launcher**: Open any installed application on your Windows machine (e.g., "open chrome").
--   **Native Notifications**: Alert you to background changes with Windows Toast notifications.
+-   **Gemini AI Brain**: Powered by `gemini-2.5-flash` with local memory for intelligent, contextual conversations.
+-   **Natural Voice TTS**: Azure Neural TTS via `edge-tts` with expressive `AriaNeural` voice profile.
+-   **Persistent GUI Overlay**: Floating dark-mode search bar (CustomTkinter) — always on top, status LED indicator.
+-   **Porcupine Wake-Word Engine**: Always-on passive listening — say "picovoice" to activate Cindy hands-free.
+-   **Multi-Turn Voice Conversations**: Cindy keeps the mic open automatically when she asks a follow-up question.
+-   **Agentic Desktop Control**: Physically control your mouse, keyboard, and take screenshots via `pyautogui`.
+-   **Google Workspace Integration**: Read your Google Calendar events and send emails by voice.
+-   **Web Search**: Launch Google searches instantly via Chrome or Brave.
+-   **GUI To-Do Overlay**: Transparent, always-on-top checklist interface.
+-   **App Launcher**: Open any installed Windows application by name.
+-   **System Optimizer**: Kill background processes and clear temp folders to free RAM.
+-   **System Tray**: Run silently in the background via the system tray.
+-   **Windows Notifications**: Native Toast notification support.
 
 ## Installation
 
