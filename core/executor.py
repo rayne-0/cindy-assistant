@@ -15,6 +15,7 @@ from utils.tasks import add_task, get_tasks
 from utils.gemini_client import ask_assistant
 from utils.overlay import show_overlay
 from utils.optimizer import speed_up_system
+from utils.agent_control import run_agent_command
 import config
 from plyer import notification
 
@@ -114,6 +115,12 @@ def _execute_command_inner(action, assistant=None):
             elif browser == "brave":
                 os.system(f'start brave "{url}"')
                 return f"Searching for {query} on Brave."
+
+        # -----------------------------
+        # Agent Computer Control
+        # -----------------------------
+        if command == "agent":
+            return run_agent_command(value.get("action"), value)
 
         # -----------------------------
         # Gemini Chat Fallback

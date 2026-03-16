@@ -124,6 +124,24 @@ def parse_command(command: str):
         return "time"
 
     # ----------------------------------
+    # Agent (Computer Control) Commands
+    # Pattern: agent type <text>, agent click, agent press <key>, agent screenshot
+    # ----------------------------------
+    if command.startswith("agent "):
+        rest = command[6:].strip()
+        if rest.startswith("type "):
+            return ("agent", {"action": "type", "text": rest[5:]})
+        elif rest.startswith("press "):
+            return ("agent", {"action": "press", "key": rest[6:]})
+        elif rest.startswith("click"):
+            return ("agent", {"action": "click"})
+        elif rest == "screenshot":
+            return ("agent", {"action": "screenshot"})
+        elif rest.startswith("hotkey "):
+            keys = rest[7:].split("+")
+            return ("agent", {"action": "hotkey", "keys": keys})
+
+    # ----------------------------------
     # Unknown Command Fallback to LLM
     # ----------------------------------
     return ("chat", command)
