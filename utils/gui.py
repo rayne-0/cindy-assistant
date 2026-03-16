@@ -28,6 +28,9 @@ class CindyOverlay:
         self.root = ctk.CTk()
         self.root.title("Cindy Assistant")
         
+        # Silence internal Tkinter 'after' callback errors that happen during polling
+        self.root.report_callback_exception = lambda *args: None
+        
         # Make the window borderless and always on top
         self.root.overrideredirect(True)
         self.root.attributes("-topmost", True)

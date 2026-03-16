@@ -5,8 +5,9 @@ load_dotenv()
 
 from core.assistant import CindyAssistant
 
-from input import get_text_input, listen_for_command
-from output import speak, log
+from input.voice_input import wait_for_wake_word, listen_for_command
+from output.speaker import speak
+from output.logger import log
 
 from utils.constants import (
     ASSISTANT_NAME,
@@ -53,35 +54,30 @@ def main():
     in_voice_mode = False
 
     while True:
-
-        if in_voice_mode:
-
+        
+        # Idle listening state with passive LED check
+        overlay.update_status_externally("idle")
+        status, payload = wait_for_wake_word(overlay=overlay)
+        
+        # If the user typed manually into the GUI while we were passively recording
+        if status == "MANUAL_OVERRIDE":
+            user_input = payload
+        
+        # If the passive listener caught the "picovoice" hotword
+        elif status == "VOICE":
+            overlay.update_status_externally("listening")
             user_input = listen_for_command()
-
             if not user_input:
                 continue
-
-            if EXIT_VOICE_COMMAND in user_input:
-                print("Exiting Voice Mode.")
-                in_voice_mode = False
-                continue
-
+                
         else:
+            # Wake word engine failed or encountered an error
+            continue
 
-            user_input = get_text_input(overlay)
-
-            if user_input == EXIT_COMMAND:
-
-                if config.ENABLE_LOGGING:
-                    log("Exiting Cindy.")
-
-                break
-
-            if user_input == VOICE_MODE_COMMAND and config.ENABLE_VOICE_INPUT:
-
-                print("Entering Voice Mode. Say 'exit voice mode' to return to text input.")
-                in_voice_mode = True
-                continue
+        if user_input == EXIT_COMMAND or user_input == EXIT_VOICE_COMMAND:
+            if config.ENABLE_LOGGING:
+                log("Exiting Cindy.")
+            break
 
         if config.ENABLE_LOGGING:
             log(f"User: {user_input}")
